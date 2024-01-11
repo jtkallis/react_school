@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Todo {
+  id String @id @default(uuid())
+  title String
+  complete Boolean
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model School {
+  id String @id @default(uuid())
+  name String
+  address String
+  phone String
+  buildings Building[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Building {
+  id String @id @default(uuid())
+  name String
+  address String
+  school School @relation(fields: [schoolID], references: [id])
+  schoolID String
+  sections Section[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Course {
+  id String @id @default(uuid())
+  name String
+  teacher Teacher @relation(fields: [teacherID], references: [id])
+  teacherID String
+  department Department @relation(fields: [departmentID], references: [id])
+  departmentID String
+  sections Section[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model Department {
+  id String @id @default(uuid())
+  name String
+  teachers Teacher[]
+  courses Course[]
+  students Student[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Teacher {
+  id String @id @default(uuid())
+  firstName String
+  lastName String
+  department Department @relation(fields: [departmentID], references: [id])
+  departmentID String
+  courses Course[]
+  sections Section[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+ model Section {
+  id String @id @default(uuid())
+  days DateTime
+  time DateTime
+  courseID String
+  course Course @relation(fields: [courseID], references: [id])
+  teacherID String
+  teacher Teacher @relation(fields: [teacherID], references: [id])
+  buildingID String
+  building Building @relation(fields: [buildingID], references: [id])
+  students StudentSections[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ }
+
+model Student {
+  id String @id @default(uuid())
+  firstName String
+  lastName String
+  major  Department @relation(fields: [majorID], references: [id])
+  majorID String
+  sections StudentSections[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StudentSections {
+  student Student @relation(fields: [studentID], references: [id])
+  studentID String
+  section Section @relation(fields: [sectionID], references: [id])
+  sectionID String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@id([studentID, sectionID])
+}
